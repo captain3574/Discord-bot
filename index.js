@@ -3,7 +3,7 @@ const app = express();
 
 // Load environment variables from .env file
 require('dotenv').config();
-const { Client } = require("discord.js");
+const { Client, GatewayIntentBits} = require("discord.js");
 
 // Import voice tools from @discordjs/voice library
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
@@ -15,7 +15,10 @@ const PREFIX = '!';
 
 // Initialize Discord Client with intents
 const client = new Client({
-    intents: [129]
+    intents: [GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent, 
+        GatewayIntentBits.GuildVoiceStates]
 });
 
 // Event listener: Triggered when the bot is online and ready
@@ -52,7 +55,7 @@ client.on('messageCreate', async message => {
                 const searched = await play.search(query, { limit: 1 });
                 if (!searched.length) return message.reply('ไม่พบเพลงที่คุณค้นหาครับ');
                 streamData = await play.stream(searched[0].url);
-                message.channel.send(`🎶 กำลังเล่น: **{searched[0].title}**`);
+                message.channel.send(`🎶 กำลังเล่น: **${searched[0].title}**`);
             }
 
             const connection = joinVoiceChannel({
